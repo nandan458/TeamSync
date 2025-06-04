@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coach Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue: #1da1f2;
+      --blue-dark: #1976d2;
+      --orange: #ffa726;
+      --orange-dark: #fb8c00;
+      --red: #e53935;
+      --gray-bg: #f6f8fa;
+      --gray-card: #fafdff;
+      --gray-border: #e0e7ef;
+      --text: #222;
+      --muted: #666;
+      --white: #fff;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Montserrat', Arial, sans-serif;
+      background: var(--gray-bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+    .navbar {
+      width: 100%;
+      background: var(--white);
+      box-shadow: 0 2px 8px #0001;
+      border-bottom: 1.5px solid var(--gray-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.7rem 0;
+      margin-bottom: 1.5rem;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .nav-links {
+      display: flex;
+      gap: 2.2rem;
+    }
+    .nav-link {
+      color: var(--blue-dark);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.13rem;
+      padding: 0.4rem 1.1rem;
+      border-radius: 8px;
+      transition: background 0.18s, color 0.18s;
+      position: relative;
+    }
+    .nav-link.active, .nav-link:focus {
+      background: var(--blue);
+      color: var(--white);
+      box-shadow: 0 2px 8px #1da1f233;
+    }
+    .main-content {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 2.5rem;
+      padding: 3rem 4rem;
+      background: var(--gray-bg);
+      max-width: 1600px;
+      margin: 0 auto;
+      min-height: 800px;
+    }
+    .left-col, .right-col {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--blue);
+      padding: 1.5rem 3rem;
+      box-shadow: 0 2px 8px #0001;
+      border-radius: 16px 16px 0 0;
+      margin-bottom: 2rem;
+    }
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+    }
+    .header .basketball-icon {
+      width: 2.1rem;
+      height: 2.1rem;
+      background: var(--white);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px #ffa72633;
+    }
+    .header .basketball-icon svg {
+      width: 1.7rem;
+      height: 1.7rem;
+      display: block;
+    }
+    .header-title {
+      color: var(--white);
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    .settings-btn {
+      background: var(--orange);
+      color: var(--white);
+      border: none;
+      padding: 0.7rem 1.5rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 2px 8px #ffa72633;
+      transition: background 0.18s, box-shadow 0.18s;
+    }
+    .settings-btn:hover {
+      background: var(--orange-dark);
+    }
+    .card {
+      background: var(--white);
+      border-radius: 20px;
+      box-shadow: 0 2px 16px #0001;
+      padding: 2rem 2.5rem;
+      border: 1.5px solid var(--gray-border);
+      margin-bottom: 0;
+    }
+    .practice-row {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    .practice-icon {
+      width: 3rem;
+      height: 3rem;
+      background: var(--gray-bg);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px #1da1f222;
+    }
+    .practice-icon svg {
+      width: 2rem;
+      height: 2rem;
+      display: block;
+    }
+    .practice-info {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .practice-label {
+      color: var(--blue-dark);
+      font-weight: 700;
+      font-size: 1.4rem;
+      margin-bottom: 0.2rem;
+    }
+    .practice-details {
+      color: var(--muted);
+      font-size: 1.2rem;
+    }
+    .section-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      color: var(--text);
+    }
+    .section-title .icon {
+      color: var(--blue-dark);
+      font-size: 1.2rem;
+      vertical-align: middle;
+      display: flex;
+      align-items: center;
+    }
+    .players-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 0.5rem;
+    }
+    .players-table th, .players-table td {
+      padding: 1rem 0.5rem;
+      text-align: center;
+      font-size: 1.2rem;
+    }
+    .players-table th {
+      color: var(--blue-dark);
+      font-weight: 700;
+      background: var(--gray-bg);
+      border-bottom: 2px solid var(--gray-border);
+    }
+    .players-table td {
+      color: var(--text);
+      font-weight: 500;
+    }
+    .players-table .name {
+      color: var(--red);
+      font-weight: 700;
+      text-align: left;
+    }
+    .players-table .num {
+      color: var(--orange-dark);
+      font-weight: 700;
+    }
+    .players-table .num-blue {
+      color: var(--blue-dark);
+      font-weight: 700;
+    }
+    .players-table .num-red {
+      color: var(--red);
+      font-weight: 700;
+    }
+    .players-table .rating {
+      color: var(--muted);
+      font-weight: 700;
+    }
+    .questionnaire-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.8rem;
+      margin-top: 1rem;
+    }
+    .stat-box {
+      background: var(--gray-bg);
+      border-radius: 16px;
+      padding: 1.8rem 1rem;
+      text-align: center;
+      box-shadow: 0 2px 8px #1da1f211;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .stat-box .stat {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 0.3rem;
+      color: var(--blue-dark);
+    }
+    .stat-box .stat.orange {
+      color: var(--orange-dark);
+    }
+    .stat-box .stat.red {
+      color: var(--red);
+    }
+    .stat-label {
+      font-size: 1.2rem;
+      color: var(--muted);
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+    .trend-chart {
+      width: 100%;
+      height: 320px;
+      background: #eaf4fb;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1rem;
+      margin-bottom: 0.3rem;
+      position: relative;
+    }
+    .game-focus-row {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    .game-focus-icon {
+      width: 3rem;
+      height: 3rem;
+      background: var(--orange);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px #ffa72633;
+    }
+    .game-focus-icon svg {
+      width: 2rem;
+      height: 2rem;
+      display: block;
+    }
+    .game-focus-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .game-focus-title {
+      color: var(--blue-dark);
+      font-weight: 700;
+      font-size: 1.4rem;
+      margin-bottom: 0.2rem;
+      text-decoration: underline;
+      cursor: pointer;
+    }
+    .game-focus-desc {
+      color: var(--muted);
+      font-size: 1.2rem;
+    }
+    .trophy {
+      color: var(--orange-dark);
+      font-size: 2rem;
+      margin-left: 1rem;
+    }
+    @media (max-width: 1600px) {
+      .main-content {
+        max-width: 1400px;
+        padding: 2.5rem 3rem;
+      }
+      .main-nav {
+        max-width: 1400px;
+        padding: 1rem 3rem;
+      }
+    }
+    @media (max-width: 1400px) {
+      .main-content {
+        max-width: 1200px;
+        padding: 2rem 2.5rem;
+      }
+      .main-nav {
+        max-width: 1200px;
+        padding: 1rem 2.5rem;
+      }
+    }
+    @media (max-width: 1200px) {
+      .main-content {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        padding: 2rem;
+      }
+      .questionnaire-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    .main-navbar {
+      width: 100%;
+      background: #fff;
+      border-bottom: 1px solid #f2f6fa;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      padding: 0;
+      margin: 0;
+    }
+    .main-nav {
+      display: flex;
+      align-items: center;
+      gap: 4rem;
+      padding: 1rem 4rem;
+      max-width: 1600px;
+      margin: 0 auto;
+    }
+    .main-nav-link {
+      color: #2c3e50;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 1.2rem;
+      position: relative;
+      padding: 0.7rem 0;
+      transition: color 0.2s;
+    }
+    .main-nav-link.active {
+      color: #ffa726;
+    }
+    .main-nav-link.active::after {
+      content: '';
+      display: block;
+      margin: 0 auto;
+      margin-top: 0.2rem;
+      width: 60%;
+      height: 2px;
+      background: #ffa726;
+      border-radius: 2px;
+    }
+    .main-nav-link:not(.active):hover {
+      color: #fb8c00;
+    }
+    .category-score {
+      margin-bottom: 2.2rem;
+      padding-bottom: 0.5rem;
+      line-height: 1.7;
+    }
+    .category-score:last-child {
+      margin-bottom: 0;
+    }
+    .category-score .flex {
+      margin-bottom: 0.7rem;
+    }
+    #playerStats {
+      padding-top: 0.5rem;
+      padding-bottom: 0.5rem;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+  <div class="main-navbar">
+    <nav class="main-nav">
+      <a href="home.html" class="main-nav-link">Home</a>
+      <a href="coachdashboard.html" class="main-nav-link active">Coach Dashboard</a>
+      <a href="questionare.html" class="main-nav-link">Questionnaire</a>
+    </nav>
+  </div>
+  <div class="main-content">
+    <div class="left-col">
+      <div class="header">
+        <div class="header-left">
+          <span class="basketball-icon">
+            <!-- Realistic Basketball SVG -->
+            <svg viewBox="0 0 32 32" fill="none">
+              <circle cx="16" cy="16" r="14" fill="#F7931E" stroke="#E65100" stroke-width="2"/>
+              <path d="M16 2v28M2 16h28" stroke="#222" stroke-width="2"/>
+              <path d="M6.5 6.5c7 7 12 12 19 19" stroke="#222" stroke-width="2"/>
+              <path d="M25.5 6.5c-7 7-12 12-19 19" stroke="#222" stroke-width="2"/>
+            </svg>
+          </span>
+          <span class="header-title">Coach Dashboard</span>
+        </div>
+        <button class="settings-btn">Settings</button>
+      </div>
+      <div class="card">
+        <div class="practice-row">
+          <span class="practice-icon">
+            <svg viewBox="0 0 32 32" fill="none">
+              <circle cx="16" cy="16" r="14" fill="#F7931E" stroke="#E65100" stroke-width="2"/>
+              <path d="M16 2v28M2 16h28" stroke="#222" stroke-width="2"/>
+              <path d="M6.5 6.5c7 7 12 12 19 19" stroke="#222" stroke-width="2"/>
+              <path d="M25.5 6.5c-7 7-12 12-19 19" stroke="#222" stroke-width="2"/>
+            </svg>
+          </span>
+          <div class="practice-info">
+            <span class="practice-label">Next Practice:</span>
+            <span class="practice-details">Monday, 7:00 PM · Community Gym</span>
+          </div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="section-title"><span class="icon"><svg viewBox="0 0 32 32" fill="none" width="22" height="22"><circle cx="16" cy="16" r="14" fill="#F7931E" stroke="#E65100" stroke-width="2"/><path d="M16 2v28M2 16h28" stroke="#222" stroke-width="2"/><path d="M6.5 6.5c7 7 12 12 19 19" stroke="#222" stroke-width="2"/><path d="M25.5 6.5c-7 7-12 12-19 19" stroke="#222" stroke-width="2"/></svg></span> Players Overview</div>
+        <table class="players-table">
+          <thead>
+            <tr>
+              <th>NAME</th>
+              <th>POINTS</th>
+              <th>ASSISTS</th>
+              <th>REBOUNDS</th>
+              <th>STEALS</th>
+              <th>AVG. RATING</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="name">Insert Name Here</td>
+              <td class="num-blue">17</td>
+              <td class="num">6</td>
+              <td class="num-blue">9</td>
+              <td class="num-red">2</td>
+              <td class="rating">8.7</td>
+            </tr>
+            <tr>
+              <td class="name">Insert Name Here</td>
+              <td class="num-blue">12</td>
+              <td class="num">7</td>
+              <td class="num-blue">12</td>
+              <td class="num-red">3</td>
+              <td class="rating">8.3</td>
+            </tr>
+            <tr>
+              <td class="name">Insert Name Here</td>
+              <td class="num-blue">19</td>
+              <td class="num">4</td>
+              <td class="num-blue">7</td>
+              <td class="num-red">1</td>
+              <td class="rating">8.9</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="section-title"><span class="icon" style="color:var(--orange-dark)"><svg viewBox="0 0 32 32" fill="none" width="22" height="22"><circle cx="16" cy="16" r="14" fill="#F7931E" stroke="#E65100" stroke-width="2"/><path d="M16 2v28M2 16h28" stroke="#222" stroke-width="2"/><path d="M6.5 6.5c7 7 12 12 19 19" stroke="#222" stroke-width="2"/><path d="M25.5 6.5c-7 7-12 12-19 19" stroke="#222" stroke-width="2"/></svg></span> Team Questionnaire Stats</div>
+        <div class="questionnaire-grid">
+          <div class="stat-box">
+            <div class="stat">8.6</div>
+            <div class="stat-label">INTERACTION</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat red">8.2</div>
+            <div class="stat-label">COMMUNICATION</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat orange">8.7</div>
+            <div class="stat-label">ACCOUNTABILITY</div>
+          </div>
+          <div class="stat-box">
+            <div class="stat">8.9</div>
+            <div class="stat-label">FOCUS</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="right-col">
+      <div class="card">
+        <div class="section-title"><span class="icon" style="color:var(--red)"><svg viewBox="0 0 32 32" fill="none" width="22" height="22"><circle cx="16" cy="16" r="14" fill="#F7931E" stroke="#E65100" stroke-width="2"/><path d="M16 2v28M2 16h28" stroke="#222" stroke-width="2"/><path d="M6.5 6.5c7 7 12 12 19 19" stroke="#222" stroke-width="2"/><path d="M25.5 6.5c-7 7-12 12-19 19" stroke="#222" stroke-width="2"/></svg></span> Performance Trends</div>
+        <div class="trend-chart">
+          <!-- SVG Line Chart Placeholder -->
+          <svg width="95%" height="90%" viewBox="0 0 320 200">
+            <rect x="0" y="0" width="320" height="200" rx="12" fill="#eaf4fb"/>
+            <polyline points="20,170 80,120 140,140 200,90 260,70 300,40" fill="none" stroke="#1da1f2" stroke-width="3"/>
+            <circle cx="20" cy="170" r="5" fill="#1da1f2"/>
+            <circle cx="80" cy="120" r="5" fill="#1da1f2"/>
+            <circle cx="140" cy="140" r="5" fill="#1da1f2"/>
+            <circle cx="200" cy="90" r="5" fill="#1da1f2"/>
+            <circle cx="260" cy="70" r="5" fill="#1da1f2"/>
+            <circle cx="300" cy="40" r="5" fill="#1da1f2"/>
+            <text x="20" y="190" font-size="14" fill="#1976d2">Game 1</text>
+            <text x="80" y="190" font-size="14" fill="#1976d2">Game 2</text>
+            <text x="140" y="190" font-size="14" fill="#1976d2">Game 3</text>
+            <text x="200" y="190" font-size="14" fill="#1976d2">Game 4</text>
+            <text x="260" y="190" font-size="14" fill="#1976d2">Game 5</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- New Player Questionnaire Stats Section -->
+      <div class="card">
+        <div class="section-title"><span class="icon" style="color:var(--orange-dark)"><svg viewBox="0 0 32 32" fill="none" width="22" height="22"><circle cx="16" cy="16" r="14" fill="#F7931E" stroke="#E65100" stroke-width="2"/><path d="M16 2v28M2 16h28" stroke="#222" stroke-width="2"/><path d="M6.5 6.5c7 7 12 12 19 19" stroke="#222" stroke-width="2"/><path d="M25.5 6.5c-7 7-12 12-19 19" stroke="#222" stroke-width="2"/></svg></span> Player Team Chemistry Report</div>
+        
+        <!-- Player Selection -->
+        <div class="mb-6">
+          <select id="playerSelect" class="w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-orange focus:border-transparent text-lg font-semibold">
+            <option value="">Choose a player to view their report...</option>
+            <option value="jordan">Jordan Smith</option>
+            <option value="taylor">Taylor Lee</option>
+            <option value="morgan">Morgan Kim</option>
+            <option value="alex">Alex Rivera</option>
+            <option value="casey">Casey Patel</option>
+          </select>
+        </div>
+
+        <!-- Player Stats Display -->
+        <div id="playerStats" class="hidden">
+          <!-- Overall Score -->
+          <div class="mb-8 p-6 bg-gray-50 rounded-lg">
+            <div class="text-xl font-bold text-gray-800 mb-3">Team Chemistry Score</div>
+            <div class="flex items-center justify-between">
+              <div class="text-4xl font-extrabold text-orange-dark" id="playerOverallScore">0</div>
+              <div class="text-base font-medium text-gray-600">Total Score (out of 150)</div>
+            </div>
+          </div>
+
+          <!-- Category Scores -->
+          <div class="space-y-6">
+            <div class="category-score">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-lg font-semibold text-gray-800">How well do you communicate with teammates?</span>
+                <span class="text-lg font-bold text-blue-dark" id="commScore">0/25</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-3">
+                <div class="bg-blue-dark h-3 rounded-full" id="commBar" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <div class="category-score">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-lg font-semibold text-gray-800">How well do you work together as a team?</span>
+                <span class="text-lg font-bold text-orange" id="synergyScore">0/25</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-3">
+                <div class="bg-orange h-3 rounded-full" id="synergyBar" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <div class="category-score">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-lg font-semibold text-gray-800">How do you handle disagreements?</span>
+                <span class="text-lg font-bold text-red" id="conflictScore">0/25</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-3">
+                <div class="bg-red h-3 rounded-full" id="conflictBar" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <div class="category-score">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-lg font-semibold text-gray-800">How well do you get along with teammates?</span>
+                <span class="text-lg font-bold text-green-600" id="socialScore">0/25</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-3">
+                <div class="bg-green-600 h-3 rounded-full" id="socialBar" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <div class="category-score">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-lg font-semibold text-gray-800">How do you help and support teammates?</span>
+                <span class="text-lg font-bold text-purple-600" id="leadershipScore">0/25</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-3">
+                <div class="bg-purple-600 h-3 rounded-full" id="leadershipBar" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <div class="category-score">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-lg font-semibold text-gray-800">How committed are you to team goals?</span>
+                <span class="text-lg font-bold text-pink-600" id="commitmentScore">0/25</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-3">
+                <div class="bg-pink-600 h-3 rounded-full" id="commitmentBar" style="width: 0%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Key Insights -->
+          <div class="mt-8 p-6 bg-gray-50 rounded-lg">
+            <div class="text-xl font-bold text-gray-800 mb-4">What This Means For You</div>
+            <ul class="space-y-3 text-gray-700" id="playerInsights">
+              <!-- Insights will be populated by JavaScript -->
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="game-focus-row">
+          <span class="game-focus-icon">
+            <svg viewBox="0 0 32 32" fill="none">
+              <circle cx="16" cy="16" r="14" fill="#F7931E" stroke="#E65100" stroke-width="2"/>
+              <path d="M16 2v28M2 16h28" stroke="#222" stroke-width="2"/>
+              <path d="M6.5 6.5c7 7 12 12 19 19" stroke="#222" stroke-width="2"/>
+              <path d="M25.5 6.5c-7 7-12 12-19 19" stroke="#222" stroke-width="2"/>
+            </svg>
+          </span>
+          <div class="game-focus-info">
+            <span class="game-focus-title">Game Focus</span>
+            <span class="game-focus-desc">Keep up the team spirit and hustle on the court!</span>
+          </div>
+          <span class="trophy">&#x1F3C6;</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Player Modal -->
+  <div id="playerModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40 hidden">
+    <div class="bg-white rounded-2xl shadow-lg max-w-lg w-full p-6 relative">
+      <button id="closeModal" class="absolute top-3 right-3 text-gray-400 hover:text-orange-500 text-2xl">&times;</button>
+      <div id="modalContent"></div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // Placeholder player data
+    const categories = [
+      'Communication', 'Synergy', 'Conflict', 'Social', 'Leadership', 'Commitment'
+    ];
+    const players = [
+      {
+        name: 'Jordan Smith',
+        avatar: '',
+        scores: [8, 7, 9, 6, 7, 8],
+        answers: Array(30).fill('Sample answer...')
+      },
+      {
+        name: 'Taylor Lee',
+        avatar: '',
+        scores: [5, 6, 7, 5, 6, 7],
+        answers: Array(30).fill('Sample answer...')
+      },
+      {
+        name: 'Morgan Kim',
+        avatar: '',
+        scores: [9, 8, 8, 9, 8, 9],
+        answers: Array(30).fill('Sample answer...')
+      },
+      {
+        name: 'Alex Rivera',
+        avatar: '',
+        scores: [6, 5, 6, 7, 5, 6],
+        answers: Array(30).fill('Sample answer...')
+      },
+      {
+        name: 'Casey Patel',
+        avatar: '',
+        scores: [7, 7, 8, 8, 7, 7],
+        answers: Array(30).fill('Sample answer...')
+      }
+    ];
+    // Calculate team averages
+    function getTeamAverages() {
+      const sums = Array(categories.length).fill(0);
+      players.forEach(p => p.scores.forEach((s, i) => sums[i] += s));
+      return sums.map(s => s / players.length);
+    }
+    function getTeamTotalAvg() {
+      return Math.round(players.reduce((sum, p) => sum + p.scores.reduce((a, b) => a + b, 0), 0) / players.length / (categories.length * 10) * 100);
+    }
+    // Render radar chart
+    function renderRadar() {
+      const ctx = document.getElementById('teamRadarChart').getContext('2d');
+      const data = getTeamAverages();
+      if (window.radarChart) window.radarChart.destroy();
+      window.radarChart = new Chart(ctx, {
+        type: 'radar',
+        data: {
+          labels: categories,
+          datasets: [{
+            label: 'Team Avg',
+            data,
+            backgroundColor: 'rgba(30, 64, 175, 0.15)',
+            borderColor: '#1E40AF',
+            pointBackgroundColor: '#FF6B35',
+            borderWidth: 2
+          }]
+        },
+        options: {
+          scales: {
+            r: {
+              min: 0,
+              max: 10,
+              pointLabels: { font: { size: 14 } },
+              angleLines: { color: '#e0e7ef' },
+              grid: { color: '#e0e7ef' },
+              ticks: { stepSize: 2, color: '#888', backdropColor: 'transparent' }
+            }
+          },
+          plugins: { legend: { display: false } },
+          responsive: true,
+        }
+      });
+      document.getElementById('teamTotalScore').textContent = getTeamTotalAvg();
+    }
+    // Render player cards
+    function renderPlayers(filter = '') {
+      const grid = document.getElementById('playerGrid');
+      grid.innerHTML = '';
+      players.filter(p => p.name.toLowerCase().includes(filter.toLowerCase())).forEach((p, idx) => {
+        const total = p.scores.reduce((a, b) => a + b, 0);
+        const totalColor = total >= 48 ? 'text-green-600' : total >= 36 ? 'text-yellow-500' : 'text-red-600';
+        let badges = '';
+        p.scores.forEach((s, i) => {
+          const badgeColor = s >= 8 ? 'bg-green-100 text-green-700' : s >= 6 ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700';
+          badges += `<span class="px-2 py-1 rounded-full text-xs font-semibold mr-1 mb-1 inline-block ${badgeColor}">${categories[i]}: ${s}</span>`;
+        });
+        // Any weak area?
+        const needsImprovement = p.scores.some(s => s < 6);
+        const warningIcon = needsImprovement ? '<span class="ml-2 text-red-500" title="Needs Improvement">&#x26A0;</span>' : '';
+        // Avatar (initials)
+        const initials = p.name.split(' ').map(n => n[0]).join('').toUpperCase();
+        grid.innerHTML += `
+          <div class="bg-white rounded-2xl shadow-md p-5 flex flex-col gap-3 hover:bg-gray-50 transition cursor-pointer" onclick="showPlayerModal(${idx})">
+            <div class="flex items-center gap-3">
+              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-orange-200 to-blue-200 flex items-center justify-center text-xl font-bold text-blue-900 border-2 border-orange-400">${initials}</div>
+              <div>
+                <div class="font-bold text-lg text-gray-800 flex items-center">${p.name} ${warningIcon}</div>
+                <div class="text-sm text-gray-500">Total Score: <span class="${totalColor}">${total}/60</span></div>
+              </div>
+            </div>
+            <div class="flex flex-wrap gap-1 mt-2">${badges}</div>
+          </div>
+        `;
+      });
+    }
+    // Modal logic
+    window.showPlayerModal = function(idx) {
+      const p = players[idx];
+      let answersHtml = '';
+      for (let i = 0; i < categories.length; i++) {
+        answersHtml += `<div class='mb-2'><span class='font-semibold text-blue-700'>${categories[i]}:</span> <span class='text-gray-700'>${p.scores[i]}</span></div>`;
+      }
+      document.getElementById('modalContent').innerHTML = `
+        <div class="flex items-center gap-3 mb-4">
+          <div class="w-14 h-14 rounded-full bg-gradient-to-br from-orange-200 to-blue-200 flex items-center justify-center text-2xl font-bold text-blue-900 border-2 border-orange-400">${p.name.split(' ').map(n => n[0]).join('').toUpperCase()}</div>
+          <div>
+            <div class="font-bold text-xl text-gray-800">${p.name}</div>
+            <div class="text-sm text-gray-500">Total Score: <span class="font-bold">${p.scores.reduce((a,b)=>a+b,0)}/60</span></div>
+          </div>
+        </div>
+        <div class="mb-4">
+          <div class="font-semibold mb-2">Category Scores</div>
+          ${answersHtml}
+        </div>
+        <div class="mb-2 font-semibold text-orange-600 flex items-center gap-2"><span>🏀</span> Suggested Coaching Tips</div>
+        <ul class="list-disc list-inside text-gray-700 mb-2">
+          <li>Encourage open communication and trust-building exercises.</li>
+          <li>Focus on teamwork drills for synergy and support.</li>
+          <li>Address weak areas with targeted practice sessions.</li>
+        </ul>
+        <div class="mt-2 text-xs text-gray-400">(Answers and tips are placeholders.)</div>
+      `;
+      document.getElementById('playerModal').classList.remove('hidden');
+    }
+    document.getElementById('closeModal').onclick = function() {
+      document.getElementById('playerModal').classList.add('hidden');
+    };
+    // Search/filter logic
+    document.getElementById('playerSearch').addEventListener('input', function(e) {
+      renderPlayers(e.target.value);
+    });
+    // Insights logic
+    function getInsights() {
+      // Top 3 strengths/weaknesses by team avg
+      const avgs = getTeamAverages();
+      const sorted = avgs.map((v, i) => ({cat: categories[i], val: v})).sort((a, b) => b.val - a.val);
+      return {
+        strengths: sorted.slice(0, 3),
+        weaknesses: sorted.slice(-3).reverse(),
+        focus: sorted.slice(-2).map(s => s.cat)
+      };
+    }
+    function renderInsights() {
+      const {strengths, weaknesses, focus} = getInsights();
+      document.getElementById('topStrengths').innerHTML = strengths.map(s => `<li>${s.cat} (${s.val.toFixed(1)})</li>`).join('');
+      document.getElementById('topWeaknesses').innerHTML = weaknesses.map(s => `<li>${s.cat} (${s.val.toFixed(1)})</li>`).join('');
+      document.getElementById('focusAreas').innerHTML = focus.map(f => `<li>${f}</li>`).join('');
+    }
+    // Initial render
+    renderRadar();
+    renderPlayers();
+    renderInsights();
+
+    // Player questionnaire data
+    const playerData = {
+      jordan: {
+        name: "Jordan Smith",
+        scores: {
+          communication: 22,
+          synergy: 20,
+          conflict: 18,
+          social: 21,
+          leadership: 19,
+          commitment: 23
+        },
+        insights: [
+          "You're great at talking with your teammates and staying committed to the team",
+          "Try to be more open to different ways of solving problems on the court",
+          "Your positive attitude helps bring the team together"
+        ]
+      },
+      taylor: {
+        name: "Taylor Lee",
+        scores: {
+          communication: 19,
+          synergy: 21,
+          conflict: 20,
+          social: 18,
+          leadership: 22,
+          commitment: 20
+        },
+        insights: [
+          "You're a natural leader and great at helping others improve",
+          "Try to spend more time with teammates outside of practice",
+          "Your ability to work well with others makes the team stronger"
+        ]
+      },
+      morgan: {
+        name: "Morgan Kim",
+        scores: {
+          communication: 23,
+          synergy: 22,
+          conflict: 21,
+          social: 20,
+          leadership: 19,
+          commitment: 22
+        },
+        insights: [
+          "You're doing great in all areas of team chemistry",
+          "Keep up the good work with your clear communication",
+          "Your balanced approach helps the team succeed"
+        ]
+      },
+      alex: {
+        name: "Alex Rivera",
+        scores: {
+          communication: 17,
+          synergy: 19,
+          conflict: 16,
+          social: 18,
+          leadership: 15,
+          commitment: 20
+        },
+        insights: [
+          "You're very committed to the team's success",
+          "Try to take more initiative in helping teammates",
+          "Practice speaking up more during team discussions"
+        ]
+      },
+      casey: {
+        name: "Casey Patel",
+        scores: {
+          communication: 20,
+          synergy: 21,
+          conflict: 19,
+          social: 22,
+          leadership: 18,
+          commitment: 21
+        },
+        insights: [
+          "You're great at making everyone feel welcome on the team",
+          "Try to take on more leadership roles during practice",
+          "Your positive energy helps keep the team motivated"
+        ]
+      }
+    };
+
+    // Update player stats when selection changes
+    document.getElementById('playerSelect').addEventListener('change', function(e) {
+      const playerId = e.target.value;
+      const playerStats = document.getElementById('playerStats');
+      
+      if (!playerId) {
+        playerStats.classList.add('hidden');
+        return;
+      }
+
+      const player = playerData[playerId];
+      if (!player) return;
+
+      // Show stats section
+      playerStats.classList.remove('hidden');
+
+      // Update overall score
+      const totalScore = Object.values(player.scores).reduce((a, b) => a + b, 0);
+      document.getElementById('playerOverallScore').textContent = totalScore;
+
+      // Update category scores and bars
+      const categories = {
+        comm: 'communication',
+        synergy: 'synergy',
+        conflict: 'conflict',
+        social: 'social',
+        leadership: 'leadership',
+        commitment: 'commitment'
+      };
+
+      for (const [key, category] of Object.entries(categories)) {
+        const score = player.scores[category];
+        document.getElementById(`${key}Score`).textContent = `${score}/25`;
+        document.getElementById(`${key}Bar`).style.width = `${(score / 25) * 100}%`;
+      }
+
+      // Update insights
+      const insightsList = document.getElementById('playerInsights');
+      insightsList.innerHTML = player.insights.map(insight => 
+        `<li class="flex items-start text-lg">
+          <span class="text-orange mr-3 text-xl">•</span>
+          <span class="font-medium">${insight}</span>
+        </li>`
+      ).join('');
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Chemistry Questionnaire</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'orange': '#FF6B35',
+                        'blue': '#1E40AF',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .form-radio:checked {
+            accent-color: #FF6B35;
+        }
+        .question-card {
+            transition: background 0.2s;
+        }
+        .question-card:hover {
+            background: #f8fafc;
+        }
+        .court-bg {
+            background-image: linear-gradient(rgba(30, 64, 175, 0.9), rgba(30, 64, 175, 0.9)),
+                            url('data:image/svg+xml,<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><rect width="100" height="100" fill="none" stroke="white" stroke-width="0.5" stroke-dasharray="2 2"/></svg>');
+            background-size: 50px 50px;
+        }
+        .progress-bar {
+            @apply fixed top-0 left-0 h-1 bg-orange transition-all duration-300;
+        }
+        .section-indicator {
+            @apply fixed left-4 top-1/2 transform -translate-y-1/2 hidden lg:block;
+        }
+        .section-dot {
+            @apply w-3 h-3 rounded-full bg-gray-300 mb-4 transition-all duration-300;
+        }
+        .section-dot.active {
+            @apply bg-orange scale-125;
+        }
+        .slider-container {
+            @apply relative w-full h-2 bg-gray-200 rounded-full;
+        }
+        .slider {
+            @apply absolute h-full bg-orange rounded-full;
+        }
+        .slider-handle {
+            @apply absolute w-6 h-6 bg-white rounded-full border-2 border-orange -top-2 transform -translate-x-1/2 cursor-pointer;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .bounce {
+            animation: bounce 2s infinite;
+        }
+        .main-navbar {
+            width: 100%;
+            background: #fff;
+            border-bottom: 1px solid #f2f6fa;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            padding: 0;
+            margin: 0;
+        }
+        .main-nav {
+            display: flex;
+            align-items: center;
+            gap: 3rem;
+            padding: 0.5rem 2rem 0.5rem 1rem;
+        }
+        .main-nav-link {
+            color: #2c3e50;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.08rem;
+            position: relative;
+            padding: 0.5rem 0;
+            transition: color 0.2s;
+        }
+        .main-nav-link.active {
+            color: #ffa726;
+        }
+        .main-nav-link.active::after {
+            content: '';
+            display: block;
+            margin: 0 auto;
+            margin-top: 0.2rem;
+            width: 60%;
+            height: 2px;
+            background: #ffa726;
+            border-radius: 2px;
+        }
+        .main-nav-link:not(.active):hover {
+            color: #fb8c00;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="main-navbar">
+        <nav class="main-nav">
+            <a href="home.html" class="main-nav-link">Home</a>
+            <a href="coachdashboard.html" class="main-nav-link">Coach Dashboard</a>
+            <a href="questionare.html" class="main-nav-link active">Questionnaire</a>
+        </nav>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-bar" id="progressBar"></div>
+
+    <!-- Section Indicator -->
+    <div class="section-indicator" id="sectionIndicator">
+        <div class="section-dot active" data-section="communication"></div>
+        <div class="section-dot" data-section="synergy"></div>
+        <div class="section-dot" data-section="conflict"></div>
+        <div class="section-dot" data-section="social"></div>
+        <div class="section-dot" data-section="leadership"></div>
+        <div class="section-dot" data-section="commitment"></div>
+    </div>
+
+    <!-- Header Section -->
+    <header class="py-10 px-4">
+        <div class="max-w-4xl mx-auto text-center">
+            <h1 class="text-4xl md:text-5xl font-black text-black flex items-center justify-center mb-4">
+                <span class="mr-3 text-5xl">🏀</span> Team Chemistry Questionnaire
+            </h1>
+            <p class="text-lg text-gray-500">Help us better understand and strengthen our team dynamics.</p>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto py-8 px-4">
+        <form class="space-y-8" id="questionnaireForm">
+            <!-- Name Input Section -->
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-4">
+                <label for="playerName" class="block text-lg font-semibold text-gray-700 mb-2">Enter your name here</label>
+                <input type="text" id="playerName" name="playerName" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange focus:border-transparent" placeholder="Enter your name here" required />
+            </div>
+            <!-- Communication & Trust Section -->
+            <section class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-orange mb-6 flex items-center">
+                    <span class="mr-2">🏀</span> Communication & Trust
+                </h2>
+                <div class="space-y-6">
+                    <div class="question-card p-4 rounded-lg">
+                        <p class="text-gray-700 mb-3">I feel comfortable communicating openly with my teammates.</p>
+                        <div class="flex gap-4">
+                            <label class="flex items-center"><input type="radio" name="q1" class="form-radio" value="1"><span class="ml-2">1</span></label>
+                            <label class="flex items-center"><input type="radio" name="q1" class="form-radio" value="2"><span class="ml-2">2</span></label>
+                            <label class="flex items-center"><input type="radio" name="q1" class="form-radio" value="3"><span class="ml-2">3</span></label>
+                            <label class="flex items-center"><input type="radio" name="q1" class="form-radio" value="4"><span class="ml-2">4</span></label>
+                            <label class="flex items-center"><input type="radio" name="q1" class="form-radio" value="5"><span class="ml-2">5</span></label>
+                        </div>
+                    </div>
+                    <div class="question-card p-4 rounded-lg">
+                        <p class="text-gray-700 mb-3">My teammates trust my decisions on the court.</p>
+                        <div class="flex gap-4">
+                            <label class="flex items-center"><input type="radio" name="q2" class="form-radio" value="1"><span class="ml-2">1</span></label>
+                            <label class="flex items-center"><input type="radio" name="q2" class="form-radio" value="2"><span class="ml-2">2</span></label>
+                            <label class="flex items-center"><input type="radio" name="q2" class="form-radio" value="3"><span class="ml-2">3</span></label>
+                            <label class="flex items-center"><input type="radio" name="q2" class="form-radio" value="4"><span class="ml-2">4</span></label>
+                            <label class="flex items-center"><input type="radio" name="q2" class="form-radio" value="5"><span class="ml-2">5</span></label>
+                        </div>
+                    </div>
+                    <div class="question-card p-4 rounded-lg">
+                        <p class="text-gray-700 mb-3">We openly discuss game strategies without hesitation.</p>
+                        <div class="flex gap-4">
+                            <label class="flex items-center"><input type="radio" name="q3" class="form-radio" value="1"><span class="ml-2">1</span></label>
+                            <label class="flex items-center"><input type="radio" name="q3" class="form-radio" value="2"><span class="ml-2">2</span></label>
+                            <label class="flex items-center"><input type="radio" name="q3" class="form-radio" value="3"><span class="ml-2">3</span></label>
+                            <label class="flex items-center"><input type="radio" name="q3" class="form-radio" value="4"><span class="ml-2">4</span></label>
+                            <label class="flex items-center"><input type="radio" name="q3" class="form-radio" value="5"><span class="ml-2">5</span></label>
+                        </div>
+                    </div>
+                    <div class="question-card p-4 rounded-lg">
+                        <p class="text-gray-700 mb-3">I feel comfortable asking my teammates for help.</p>
+                        <div class="flex gap-4">
+                            <label class="flex items-center"><input type="radio" name="q4" class="form-radio" value="1"><span class="ml-2">1</span></label>
+                            <label class="flex items-center"><input type="radio" name="q4" class="form-radio" value="2"><span class="ml-2">2</span></label>
+                            <label class="flex items-center"><input type="radio" name="q4" class="form-radio" value="3"><span class="ml-2">3</span></label>
+                            <label class="flex items-center"><input type="radio" name="q4" class="form-radio" value="4"><span class="ml-2">4</span></label>
+                            <label class="flex items-center"><input type="radio" name="q4" class="form-radio" value="5"><span class="ml-2">5</span></label>
+                        </div>
+                    </div>
+                    <div class="question-card p-4 rounded-lg">
+                        <p class="text-gray-700 mb-3">I listen to my teammates' ideas and opinions with respect.</p>
+                        <div class="flex gap-4">
+                            <label class="flex items-center"><input type="radio" name="q5" class="form-radio" value="1"><span class="ml-2">1</span></label>
+                            <label class="flex items-center"><input type="radio" name="q5" class="form-radio" value="2"><span class="ml-2">2</span></label>
+                            <label class="flex items-center"><input type="radio" name="q5" class="form-radio" value="3"><span class="ml-2">3</span></label>
+                            <label class="flex items-center"><input type="radio" name="q5" class="form-radio" value="4"><span class="ml-2">4</span></label>
+                            <label class="flex items-center"><input type="radio" name="q5" class="form-radio" value="5"><span class="ml-2">5</span></label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Team Synergy Section -->
+            <section class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-orange mb-6 flex items-center">
+                    <span class="mr-2">🏀</span> Team Synergy
+                </h2>
+                <div class="space-y-6">
+                    <div class="question-card p-4 rounded-lg">
+                        <p class="text-gray-700 mb-3">I understand my teammates' playing styles and adjust accordingly.</p>
+                        <div class="flex gap-4">
+                            <label class="flex items-center"><input type="radio" name="q6" class="form-radio" value="1"><span class="ml-2">1</span></label>
+                            <label class="flex items-center"><input type="radio" name="q6" class="form-radio" value="2"><span class="ml-2">2</span></label>
+                            <label class="flex items-center"><input type="radio" name="q6" class="form-radio" value="3"><span class="ml-2">3</span></label>
+                            <label class="flex items-center"><input type="radio" name="q6" class="form-radio" value="4"><span class="ml-2">4</span></label>
+                            <label class="flex items-center"><input type="radio" name="q6" class="form-radio" value="5"><span class="ml-2">5</span></label>
+                        </div>
+                    </div>
+                    <div class="question-card p-4 rounded-lg">
+                        <p class="text-gray-700 mb-3">Our team shows great coordination in high-pressure situations.</p>
+                        <div class="flex gap-4">
+                            <label class="flex items-center"><input type="radio" name="q7" class="form-radio" value="1"><span class="ml-2">1</span></label>
+                            <label class="flex items-center"><input type="radio" name="q7" class="form-radio" value="2"><span class="ml-2">2</span></label>
+                            <label class="flex items-center"><input type="radio" name="q7" class="form-radio" value="3"><span class="ml-2">3</span></label>
+                            <label class="flex items-center"><input type="radio" name="q7" class="form-radio" value="4"><span class="ml-2">4</span></label>
+                            <label class="flex items-center"><input type="radio" name="q7" class="form-radio" value="5"><span class="ml-2">5</span></label>
+                        </div>
+                    </div>
+                    <div class="question-card p-4 rounded-lg">
+                        <p class="text-gray-700 mb-3">We maintain composure and adapt when our game plan changes.</p>
+                        <div class="flex gap-4">
+                            <label class="flex items-center"><input type="radio" name="q8" class="form-radio" value="1"><span class="ml-2">1</span></label>
+                            <label class="flex items-center"><input type="radio" name="q8" class="form-radio" value="2"><span class="ml-2">2</span></label>
+                            <label class="flex items-center"><input type="radio" name="q8" class="form-radio" value="3"><span class="ml-2">3</span></label>
+                            <label class="flex items-center"><input type="radio" name="q8" class="form-radio" value="4"><span class="ml-2">4</span></label>
+                            <label class="flex items-center"><input type="radio" name="q8" class="form-radio" value="5"><span class="ml-2">5</span></label>
+                        </div>
+                    </div>
+                    <div class="question-card p-4 rounded-lg">
+                        <p class="text-gray-700 mb-3">I enjoy working together with my teammates in practice sessions.</p>
+                        <div class="flex gap-4">
+                            <label class="flex items-center"><input type="radio" name="q9" class="form-radio" value="1"><span class="ml-2">1</span></label>
+                            <label class="flex items-center"><input type="radio" name="q9" class="form-radio" value="2"><span class="ml-2">2</span></label>
+                            <label class="flex items-center"><input type="radio" name="q9" class="form-radio" value="3"><span class="ml-2">3</span></label>
+                            <label class="flex items-center"><input type="radio" name="q9" class="form-radio" value="4"><span class="ml-2">4</span></label>
+                            <label class="flex items-center"><input type="radio" name="q9" class="form-radio" value="5"><span class="ml-2">5</span></label>
+                        </div>
+                    </div>
+                    <div class="question-card p-4 rounded-lg">
+                        <p class="text-gray-700 mb-3">We cheer for each other even when we make mistakes.</p>
+                        <div class="flex gap-4">
+                            <label class="flex items-center"><input type="radio" name="q10" class="form-radio" value="1"><span class="ml-2">1</span></label>
+                            <label class="flex items-center"><input type="radio" name="q10" class="form-radio" value="2"><span class="ml-2">2</span></label>
+                            <label class="flex items-center"><input type="radio" name="q10" class="form-radio" value="3"><span class="ml-2">3</span></label>
+                            <label class="flex items-center"><input type="radio" name="q10" class="form-radio" value="4"><span class="ml-2">4</span></label>
+                            <label class="flex items-center"><input type="radio" name="q10" class="form-radio" value="5"><span class="ml-2">5</span></label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Conflict Resolution Section -->
+            <section class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-orange mb-6 flex items-center">
+                    <span class="mr-2">🏀</span> Conflict Resolution
+                </h2>
+                <div class="space-y-6">
+                    <div class="question-card p-4 rounded-lg">
+                        <p class="text-gray-700 mb-3">Conflicts within the team are resolved constructively.</p>
+                        <div class="flex gap-4">
+                            <label class="flex items-center"><input type="radio" name="q11" class="form-radio" value="1"><span class="ml-2">1</span></label>
+                            <label class="flex items-center"><input type="radio" name="q11" class="form-radio" value="2"><span class="ml-2">2</span></label>
+                            <label class="flex items-center"><input type="radio" name="q11" class="form-radio" value="3"><span class="ml-2">3</span></label>
+                            <label class="flex items-center"><input type="radio" name="q11" class="form-radio" value="4"><span class="ml-2">4</span></label>
+                            <label class="flex items-center"><input type="radio" name="q11" class="form-radio" value="5"><span class="ml-2">5</span></label>
+                        </div>
+                    </div>
+                    <div class="question-card p-4 rounded-lg">
+                        <p class="text-gray-700 mb-3">I feel comfortable addressing issues with teammates when necessary.</p>
+                        <div class="flex gap-4">
+                            <label class="flex items-center"><input type="radio" name="q12" class="form-radio" value="1"><span class="ml-2">1</span></label>
+                            <label class="flex items-center"><input type="radio" name="q12" class="form-radio" value="2"><span class="ml-2">2</span></label>
+                            <label class="flex items-center"><input type="radio" name="q12" class="form-radio" value="3"><span class="ml-2">3</span></label>
+                            <label class="flex items-center"><input type="radio" name="q12" class="form-radio" value="4"><span class="ml-2">4</span></label>
+                            <label class="flex items-center"><input type="radio" name="q12" class="form-radio" value="5"><span class="ml-2">5</span></label>
+                        </div>
+                    </div>
+                    <div class="question-card p-4 rounded-lg">
+                        <p class="text-gray-700 mb-3">Criticism within the team is taken positively and helps improvement.</p>
+                        <div class="flex gap-4">
+                            <label class="flex items-center"><input type="radio" name="q13" class="form-radio" value="1"><span class="ml-2">1</span></label>
+                            <label class="flex items-center"><input type="radio" name="q13" class="form-radio" value="2"><span class="ml-2">2</span></label>
+                            <label class="flex items-center"><input type="radio" name="q13" class="form-radio" value="3"><span class="ml-2">3</span></label>
+                            <label class="flex items-center"><input type="radio" name="q13" class="form-radio" value="4"><span class="ml-2">4</span></label>
+                            <label class="flex items-center"><input type="radio" name="q13" class="form-radio" value="5"><span class="ml-2">5</span></label>
+                        </div>
+                    </div>
+                    <div class="question-card p-4 rounded-lg">
+                        <p class="text-gray-700 mb-3">I try to solve disagreements with teammates in a friendly way.</p>
+                        <div class="flex gap-4">
+                            <label class="flex items-center"><input type="radio" name="q14" class="form-radio" value="1"><span class="ml-2">1</span></label>
+                            <label class="flex items-center"><input type="radio" name="q14" class="form-radio" value="2"><span class="ml-2">2</span></label>
+                            <label class="flex items-center"><input type="radio" name="q14" class="form-radio" value="3"><span class="ml-2">3</span></label>
+                            <label class="flex items-center"><input type="radio" name="q14" class="form-radio" value="4"><span class="ml-2">4</span></label>
+                            <label class="flex items-center"><input type="radio" name="q14" class="form-radio" value="5"><span class="ml-2">5</span></label>
+                        </div>
+                    </div>
+                    <div class="question-card p-4 rounded-lg">
+                        <p class="text-gray-700 mb-3">If I see a teammate struggling, I help them instead of ignoring them.</p>
+                        <div class="flex gap-4">
+                            <label class="flex items-center"><input type="radio" name="q15" class="form-radio" value="1"><span class="ml-2">1</span></label>
+                            <label class="flex items-center"><input type="radio" name="q15" class="form-radio" value="2"><span class="ml-2">2</span></label>
+                            <label class="flex items-center"><input type="radio" name="q15" class="form-radio" value="3"><span class="ml-2">3</span></label>
+                            <label class="flex items-center"><input type="radio" name="q15" class="form-radio" value="4"><span class="ml-2">4</span></label>
+                            <label class="flex items-center"><input type="radio" name="q15" class="form-radio" value="5"><span class="ml-2">5</span></label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Social Interaction Section -->
+            <section class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-orange mb-6 flex items-center">
+                    <span class="mr-2">🏀</span> Social Interaction
+                </h2>
+                <div class="space-y-6">
+                    <div class="question-card p-4 rounded-lg">
+                        <p class="text-gray-700 mb-3">We spend time together outside of practice.</p>
+                        <div class="flex gap-4">
+                            <label class="flex items-center"><input type="radio" name="q16" class="form-radio" value="1"><span class="ml-2">1</span></label>
+                            <label class="flex items-center"><input type="radio" name="q16" class="form-radio" value="2"><span class="ml-2">2</span></label>
+                            <label class="flex items-center"><input type="radio" name="q16" class="form-radio" value="3"><span class="ml-2">3</span></label>
+                            <label class="flex items-center"><input type="radio" name="q16" class="form-radio" value="4"><span class="ml-2">4</span></label>
+                            <label class="flex items-center"><input type="radio" name="q16" class="form-radio" value="5"><span class="ml-2">5</span></label>
+                        </div>
+                    </div>
+                    <div class="question-card p-4 rounded-lg">
+                        <p class="text-gray-700 mb-3">I feel a sense of belonging within the team.</p>
+                        <div class="flex gap-4">
+                            <label class="flex items-center"><input type="radio" name="q17" class="form-radio" value="1"><span class="ml-2">1</span></label>
+                            <label class="flex items-center"><input type="radio" name="q17" class="form-radio" value="2"><span class="ml-2">2</span></label>
+                            <label class="flex items-center"><input type="radio" name="q17" class="form-radio" value="3"><span class="ml-2">3</span></label>
+                            <label class="flex items-center"><input type="radio" name="q17" class="form-radio" value="4"><span class="ml-2">4</span></label>
+                            <label class="flex items-center"><input type="radio" name="q17" class="form-radio" value="5"><span class="ml-2">5</span></label>
+                        </div>
+                    </div>
+                    <div class="question-card p-4 rounded-lg">
+                        <p class="text-gray-700 mb-3">I enjoy bonding activities organized for the team.</p>
+                        <div class="flex gap-4">
+                            <label class="flex items-center"><input type="radio" name="q18" class="form-radio" value="1"><span class="ml-2">1</span></label>
+                            <label class="flex items-center"><input type="radio" name="q18" class="form-radio" value="2"><span class="ml-2">2</span></label>
+                            <label class="flex items-center"><input type="radio" name="q18" class="form-radio" value="3"><span class="ml-2">3</span></label>
+                            <label class="flex items-center"><input type="radio" name="q18" class="form-radio" value="4"><span class="ml-2">4</span></label>
+                            <label class="flex items-center"><input type="radio" name="q18" class="form-radio" value="5"><span class="ml-2">5</span></label>
+                        </div>
+                    </div>
+                    <div class="question-card p-4 rounded-lg">
+                        <p class="text-gray-700 mb-3">I like spending time with my teammates outside of basketball practice.</p>
+                        <div class="flex gap-4">
+                            <label class="flex items-center"><input type="radio" name="q19" class="form-radio" value="1"><span class="ml-2">1</span></label>
+                            <label class="flex items-center"><input type="radio" name="q19" class="form-radio" value="2"><span class="ml-2">2</span></label>
+                            <label class="flex items-center"><input type="radio" name="q19" class="form-radio" value="3"><span class="ml-2">3</span></label>
+                            <label class="flex items-center"><input type="radio" name="q19" class="form-radio" value="4"><span class="ml-2">4</span></label>
+                            <label class="flex items-center"><input type="radio" name="q19" class="form-radio" value="5"><span class="ml-2">5</span></label>
+                        </div>
+                    </div>
+                    <div class="question-card p-4 rounded-lg">
+                        <p class="text-gray-700 mb-3">I feel included in team activities, both on and off the court.</p>
+                        <div class="flex gap-4">
+                            <label class="flex items-center"><input type="radio" name="q20" class="form-radio" value="1"><span class="ml-2">1</span></label>
+                            <label class="flex items-center"><input type="radio" name="q20" class="form-radio" value="2"><span class="ml-2">2</span></label>
+                            <label class="flex items-center"><input type="radio" name="q20" class="form-radio" value="3"><span class="ml-2">3</span></label>
+                            <label class="flex items-center"><input type="radio" name="q20" class="form-radio" value="4"><span class="ml-2">4</span></label>
+                            <label class="flex items-center"><input type="radio" name="q20" class="form-radio" value="5"><span class="ml-2">5</span></label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Leadership & Support Section -->
+            <section class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-orange mb-6 flex items-center">
+                    <span class="mr-2">🏀</span> Leadership & Support
+                </h2>
+                <div class="space-y-6">
+                    <div class="question-card p-4 rounded-lg">
+                        <p class="text-gray-700 mb-3">Senior players mentor and support newer teammates.</p>
+                        <div class="flex gap-4">
+                            <label class="flex items-center"><input type="radio" name="q21" class="form-radio" value="1"><span class="ml-2">1</span></label>
+                            <label class="flex items-center"><input type="radio" name="q21" class="form-radio" value="2"><span class="ml-2">2</span></label>
+                            <label class="flex items-center"><input type="radio" name="q21" class="form-radio" value="3"><span class="ml-2">3</span></label>
+                            <label class="flex items-center"><input type="radio" name="q21" class="form-radio" value="4"><span class="ml-2">4</span></label>
+                            <label class="flex items-center"><input type="radio" name="q21" class="form-radio" value="5"><span class="ml-2">5</span></label>
+                        </div>
+                    </div>
+                    <div class="question-card p-4 rounded-lg">
+                        <p class="text-gray-700 mb-3">Encouragement is a regular part of our team culture.</p>
+                        <div class="flex gap-4">
+                            <label class="flex items-center"><input type="radio" name="q22" class="form-radio" value="1"><span class="ml-2">1</span></label>
+                            <label class="flex items-center"><input type="radio" name="q22" class="form-radio" value="2"><span class="ml-2">2</span></label>
+                            <label class="flex items-center"><input type="radio" name="q22" class="form-radio" value="3"><span class="ml-2">3</span></label>
+                            <label class="flex items-center"><input type="radio" name="q22" class="form-radio" value="4"><span class="ml-2">4</span></label>
+                            <label class="flex items-center"><input type="radio" name="q22" class="form-radio" value="5"><span class="ml-2">5</span></label>
+                        </div>
+                    </div>
+                    <div class="question-card p-4 rounded-lg">
+                        <p class="text-gray-700 mb-3">I feel supported by my teammates in challenging situations.</p>
+                        <div class="flex gap-4">
+                            <label class="flex items-center"><input type="radio" name="q23" class="form-radio" value="1"><span class="ml-2">1</span></label>
+                            <label class="flex items-center"><input type="radio" name="q23" class="form-radio" value="2"><span class="ml-2">2</span></label>
+                            <label class="flex items-center"><input type="radio" name="q23" class="form-radio" value="3"><span class="ml-2">3</span></label>
+                            <label class="flex items-center"><input type="radio" name="q23" class="form-radio" value="4"><span class="ml-2">4</span></label>
+                            <label class="flex items-center"><input type="radio" name="q23" class="form-radio" value="5"><span class="ml-2">5</span></label>
+                        </div>
+                    </div>
+                    <div class="question-card p-4 rounded-lg">
+                        <p class="text-gray-700 mb-3">I look up to senior teammates and learn from them.</p>
+                        <div class="flex gap-4">
+                            <label class="flex items-center"><input type="radio" name="q24" class="form-radio" value="1"><span class="ml-2">1</span></label>
+                            <label class="flex items-center"><input type="radio" name="q24" class="form-radio" value="2"><span class="ml-2">2</span></label>
+                            <label class="flex items-center"><input type="radio" name="q24" class="form-radio" value="3"><span class="ml-2">3</span></label>
+                            <label class="flex items-center"><input type="radio" name="q24" class="form-radio" value="4"><span class="ml-2">4</span></label>
+                            <label class="flex items-center"><input type="radio" name="q24" class="form-radio" value="5"><span class="ml-2">5</span></label>
+                        </div>
+                    </div>
+                    <div class="question-card p-4 rounded-lg">
+                        <p class="text-gray-700 mb-3">I try to encourage younger or newer players in the team.</p>
+                        <div class="flex gap-4">
+                            <label class="flex items-center"><input type="radio" name="q25" class="form-radio" value="1"><span class="ml-2">1</span></label>
+                            <label class="flex items-center"><input type="radio" name="q25" class="form-radio" value="2"><span class="ml-2">2</span></label>
+                            <label class="flex items-center"><input type="radio" name="q25" class="form-radio" value="3"><span class="ml-2">3</span></label>
+                            <label class="flex items-center"><input type="radio" name="q25" class="form-radio" value="4"><span class="ml-2">4</span></label>
+                            <label class="flex items-center"><input type="radio" name="q25" class="form-radio" value="5"><span class="ml-2">5</span></label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Commitment & Shared Goals Section -->
+            <section class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-orange mb-6 flex items-center">
+                    <span class="mr-2">🏀</span> Commitment & Shared Goals
+                </h2>
+                <div class="space-y-6">
+                    <div class="question-card p-4 rounded-lg">
+                        <p class="text-gray-700 mb-3">I am motivated to give my best effort in every game and practice.</p>
+                        <div class="flex gap-4">
+                            <label class="flex items-center"><input type="radio" name="q26" class="form-radio" value="1"><span class="ml-2">1</span></label>
+                            <label class="flex items-center"><input type="radio" name="q26" class="form-radio" value="2"><span class="ml-2">2</span></label>
+                            <label class="flex items-center"><input type="radio" name="q26" class="form-radio" value="3"><span class="ml-2">3</span></label>
+                            <label class="flex items-center"><input type="radio" name="q26" class="form-radio" value="4"><span class="ml-2">4</span></label>
+                            <label class="flex items-center"><input type="radio" name="q26" class="form-radio" value="5"><span class="ml-2">5</span></label>
+                        </div>
+                    </div>
+                    <div class="question-card p-4 rounded-lg">
+                        <p class="text-gray-700 mb-3">We have a shared goal and work together to achieve it.</p>
+                        <div class="flex gap-4">
+                            <label class="flex items-center"><input type="radio" name="q27" class="form-radio" value="1"><span class="ml-2">1</span></label>
+                            <label class="flex items-center"><input type="radio" name="q27" class="form-radio" value="2"><span class="ml-2">2</span></label>
+                            <label class="flex items-center"><input type="radio" name="q27" class="form-radio" value="3"><span class="ml-2">3</span></label>
+                            <label class="flex items-center"><input type="radio" name="q27" class="form-radio" value="4"><span class="ml-2">4</span></label>
+                            <label class="flex items-center"><input type="radio" name="q27" class="form-radio" value="5"><span class="ml-2">5</span></label>
+                        </div>
+                    </div>
+                    <div class="question-card p-4 rounded-lg">
+                        <p class="text-gray-700 mb-3">The team remains focused and committed throughout the season.</p>
+                        <div class="flex gap-4">
+                            <label class="flex items-center"><input type="radio" name="q28" class="form-radio" value="1"><span class="ml-2">1</span></label>
+                            <label class="flex items-center"><input type="radio" name="q28" class="form-radio" value="2"><span class="ml-2">2</span></label>
+                            <label class="flex items-center"><input type="radio" name="q28" class="form-radio" value="3"><span class="ml-2">3</span></label>
+                            <label class="flex items-center"><input type="radio" name="q28" class="form-radio" value="4"><span class="ml-2">4</span></label>
+                            <label class="flex items-center"><input type="radio" name="q28" class="form-radio" value="5"><span class="ml-2">5</span></label>
+                        </div>
+                    </div>
+                    <div class="question-card p-4 rounded-lg">
+                        <p class="text-gray-700 mb-3">I always give my best effort in training and matches.</p>
+                        <div class="flex gap-4">
+                            <label class="flex items-center"><input type="radio" name="q29" class="form-radio" value="1"><span class="ml-2">1</span></label>
+                            <label class="flex items-center"><input type="radio" name="q29" class="form-radio" value="2"><span class="ml-2">2</span></label>
+                            <label class="flex items-center"><input type="radio" name="q29" class="form-radio" value="3"><span class="ml-2">3</span></label>
+                            <label class="flex items-center"><input type="radio" name="q29" class="form-radio" value="4"><span class="ml-2">4</span></label>
+                            <label class="flex items-center"><input type="radio" name="q29" class="form-radio" value="5"><span class="ml-2">5</span></label>
+                        </div>
+                    </div>
+                    <div class="question-card p-4 rounded-lg">
+                        <p class="text-gray-700 mb-3">I understand the importance of teamwork over individual success.</p>
+                        <div class="flex gap-4">
+                            <label class="flex items-center"><input type="radio" name="q30" class="form-radio" value="1"><span class="ml-2">1</span></label>
+                            <label class="flex items-center"><input type="radio" name="q30" class="form-radio" value="2"><span class="ml-2">2</span></label>
+                            <label class="flex items-center"><input type="radio" name="q30" class="form-radio" value="3"><span class="ml-2">3</span></label>
+                            <label class="flex items-center"><input type="radio" name="q30" class="form-radio" value="4"><span class="ml-2">4</span></label>
+                            <label class="flex items-center"><input type="radio" name="q30" class="form-radio" value="5"><span class="ml-2">5</span></label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Additional Notes Section -->
+            <section class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-bold text-orange mb-6">Additional Notes</h2>
+                <textarea class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange focus:border-transparent" rows="4" placeholder="Any additional comments or suggestions..."></textarea>
+            </section>
+
+            <!-- Summary Section -->
+            <section class="bg-white rounded-xl shadow-lg p-6 flex flex-col md:flex-row items-center justify-between">
+                <div class="flex flex-col md:flex-row items-center w-full">
+                    <div class="w-56 h-56 relative">
+                        <canvas id="scorePieChart"></canvas>
+                    </div>
+                    <div class="ml-0 md:ml-8 mt-6 md:mt-0 flex flex-col items-center md:items-start">
+                        <div class="text-3xl font-extrabold text-orange mb-2" id="scoreNumber">0</div>
+                        <div class="mt-2">
+                            <div class="flex items-center mb-1"><span class="w-3 h-3 rounded-full bg-orange inline-block mr-2"></span> Communication & Trust</div>
+                            <div class="flex items-center mb-1"><span class="w-3 h-3 rounded-full bg-blue-500 inline-block mr-2"></span> Team Synergy</div>
+                            <div class="flex items-center mb-1"><span class="w-3 h-3 rounded-full bg-green-500 inline-block mr-2"></span> Conflict Resolution</div>
+                            <div class="flex items-center mb-1"><span class="w-3 h-3 rounded-full bg-yellow-500 inline-block mr-2"></span> Social Interaction</div>
+                            <div class="flex items-center mb-1"><span class="w-3 h-3 rounded-full bg-purple-500 inline-block mr-2"></span> Leadership & Support</div>
+                            <div class="flex items-center mb-1"><span class="w-3 h-3 rounded-full bg-pink-500 inline-block mr-2"></span> Commitment & Shared Goals</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-full mt-8">
+                    <div class="text-center text-xl font-semibold mt-4" id="scoreMessage">Calculating your team chemistry...</div>
+                    <div class="mt-4 flex flex-col items-center">
+                        <div class="flex items-center mb-1"><span class="w-4 h-4 rounded-full bg-gray-200 inline-block mr-2"></span> <span>30–69: <span class="text-orange-600 font-bold">Needs Work</span></span></div>
+                        <div class="flex items-center mb-1"><span class="w-4 h-4 rounded-full bg-gray-300 inline-block mr-2"></span> <span>70–109: <span class="text-blue-600 font-bold">Proficient</span></span></div>
+                        <div class="flex items-center mb-1"><span class="w-4 h-4 rounded-full bg-gray-400 inline-block mr-2"></span> <span>110–150: <span class="text-green-600 font-bold">Excellent Chemistry</span></span></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Action Buttons -->
+            <div class="text-center">
+                <button type="submit" class="bg-orange hover:bg-orange-600 text-white font-bold py-3 px-8 rounded-full shadow-lg transition duration-300 transform hover:scale-105">
+                    Submit Questionnaire
+                </button>
+            </div>
+        </form>
+    </main>
+
+    <script>
+        // Progress bar update
+        function updateProgress() {
+            const form = document.getElementById('questionnaireForm');
+            const totalQuestions = form.querySelectorAll('input[type="radio"]').length;
+            const answeredQuestions = form.querySelectorAll('input[type="radio"]:checked').length;
+            const progress = (answeredQuestions / totalQuestions) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+        }
+
+        // Section indicator update
+        function updateSectionIndicator() {
+            const sections = document.querySelectorAll('section');
+            const dots = document.querySelectorAll('.section-dot');
+            
+            sections.forEach((section, index) => {
+                const rect = section.getBoundingClientRect();
+                if (rect.top <= window.innerHeight / 2 && rect.bottom >= window.innerHeight / 2) {
+                    dots.forEach(dot => dot.classList.remove('active'));
+                    dots[index].classList.add('active');
+                }
+            });
+        }
+
+        // Smooth scroll to section
+        document.querySelectorAll('.section-dot').forEach((dot, index) => {
+            dot.addEventListener('click', () => {
+                const sections = document.querySelectorAll('section');
+                sections[index].scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
+        // Score calculation and chart
+        function calculateScore() {
+            // Each section has 5 questions, each 1-5, so max per section is 25
+            const sectionNames = [
+                'Communication & Trust',
+                'Team Synergy',
+                'Conflict Resolution',
+                'Social Interaction',
+                'Leadership & Support',
+                'Commitment & Shared Goals'
+            ];
+            const sectionColors = [
+                '#FF6B35', // orange
+                '#3B82F6', // blue-500
+                '#22C55E', // green-500
+                '#F59E42', // yellow-500
+                '#A21CAF', // purple-500
+                '#EC4899'  // pink-500
+            ];
+            const sectionScores = [0,0,0,0,0,0];
+            let total = 0;
+            for (let i = 0; i < 6; i++) {
+                for (let j = 1; j <= 5; j++) {
+                    const qNum = i * 5 + j;
+                    const val = parseInt(document.querySelector(`input[name='q${qNum}']:checked`)?.value || 0);
+                    sectionScores[i] += val;
+                    total += val;
+                }
+            }
+            // Pie chart: each section's percent of its max (25)
+            const pieData = sectionScores.map(s => s);
+            const percentData = sectionScores.map(s => Math.round((s / 25) * 100));
+            // Update pie chart
+            const ctx = document.getElementById('scorePieChart').getContext('2d');
+            if (window.pieChartInstance) window.pieChartInstance.destroy();
+            window.pieChartInstance = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: sectionNames,
+                    datasets: [{
+                        data: pieData,
+                        backgroundColor: sectionColors
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        datalabels: {
+                            color: '#111',
+                            font: { weight: 'bold', size: 16 },
+                            formatter: function(value, context) {
+                                return percentData[context.dataIndex] + '%';
+                            }
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+            // Update score number
+            document.getElementById('scoreNumber').textContent = `${total}`;
+            // Update message
+            const message = document.getElementById('scoreMessage');
+            if (total >= 110) {
+                message.textContent = 'Excellent Chemistry!';
+            } else if (total >= 70) {
+                message.textContent = 'Proficient';
+            } else {
+                message.textContent = "Needs Work";
+            }
+        }
+
+        // Event listeners
+        document.querySelectorAll('input[type="radio"]:checked').forEach(radio => {
+            radio.addEventListener('change', updateProgress);
+        });
+
+        window.addEventListener('scroll', updateSectionIndicator);
+
+        document.getElementById('questionnaireForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            calculateScore();
+            // Collect all responses
+            const responses = {};
+            responses.name = document.getElementById('playerName').value;
+            document.querySelectorAll('input[type="radio"]:checked').forEach(radio => {
+                responses[radio.name] = radio.value;
+            });
+            // Add notes if any
+            const notes = document.querySelector('textarea').value;
+            if (notes) {
+                responses.notes = notes;
+            }
+            // Here you would typically send the data to your server
+            console.log('Form responses:', responses);
+            alert('Thank you for completing the questionnaire!');
+        });
+
+        // Initialize
+        updateProgress();
+        updateSectionIndicator();
+    </script>
+</body>
+</html>

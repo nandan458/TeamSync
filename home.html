@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TeamSync - Analyze Your Team's Chemistry</title>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --blue: #2196f3;
+      --blue-dark: #1976d2;
+      --orange: #ffa726;
+      --orange-dark: #fb8c00;
+      --gray-bg: #f7fafd;
+      --gray-light: #f2f6fa;
+      --gray-border: #e0e7ef;
+      --text: #2c3e50;
+      --muted: #546e7a;
+      --white: #fff;
+      --shadow-sm: 0 2px 8px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+      --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+      --transition: all 0.3s ease;
+    }
+    * { 
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Montserrat', Arial, sans-serif;
+      background: var(--gray-bg);
+      color: var(--text);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--white);
+      padding: 1rem 2rem;
+      box-shadow: var(--shadow-sm);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: var(--blue);
+      letter-spacing: 0.5px;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+    .logo:hover {
+      color: var(--blue-dark);
+      transform: translateY(-1px);
+    }
+    .logo svg {
+      width: 2rem;
+      height: 2rem;
+      margin-right: 0.5rem;
+    }
+    .nav {
+      display: flex;
+      gap: 2rem;
+    }
+    .nav a {
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 1rem;
+      transition: var(--transition);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      position: relative;
+    }
+    .nav a::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      width: 0;
+      height: 2px;
+      background: var(--orange);
+      transition: var(--transition);
+      transform: translateX(-50%);
+    }
+    .nav a:hover::after,
+    .nav a.active::after {
+      width: 80%;
+    }
+    .nav a:hover, .nav a.active {
+      color: var(--orange-dark);
+    }
+    .get-started-btn {
+      background: var(--orange);
+      color: var(--white);
+      border: none;
+      padding: 0.8rem 1.8rem;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 25px;
+      cursor: pointer;
+      box-shadow: var(--shadow-sm);
+      transition: var(--transition);
+    }
+    .get-started-btn:hover {
+      background: var(--orange-dark);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+    .hero {
+      text-align: center;
+      padding: 4rem 1rem 3rem;
+      background: linear-gradient(135deg, var(--gray-bg) 0%, #fff 100%);
+    }
+    .hero-title {
+      font-size: 3rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      letter-spacing: -0.5px;
+      color: var(--text);
+    }
+    .hero-title .chemistry {
+      color: var(--orange-dark);
+      position: relative;
+      display: inline-block;
+    }
+    .hero-title .chemistry::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 8px;
+      background: var(--orange);
+      opacity: 0.2;
+      z-index: -1;
+    }
+    .hero-desc {
+      color: var(--muted);
+      font-size: 1.25rem;
+      margin-bottom: 2.5rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.8;
+    }
+    .hero-desc a {
+      color: var(--blue);
+      text-decoration: none;
+      font-weight: 600;
+      position: relative;
+    }
+    .hero-desc a::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--blue);
+      transform: scaleX(0);
+      transition: var(--transition);
+    }
+    .hero-desc a:hover::after {
+      transform: scaleX(1);
+    }
+    .cta-btn {
+      background: linear-gradient(135deg, var(--blue), var(--blue-dark));
+      color: var(--white);
+      border: none;
+      padding: 1rem 2.5rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: var(--shadow-md);
+      transition: var(--transition);
+    }
+    .cta-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
+    .basketball-icon {
+      margin: 3rem auto 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .basketball-icon svg {
+      width: 4.5rem;
+      height: 4.5rem;
+      background: var(--orange);
+      border-radius: 50%;
+      box-shadow: var(--shadow-md);
+      padding: 0.8rem;
+      transition: var(--transition);
+    }
+    .basketball-icon:hover svg {
+      transform: scale(1.1);
+    }
+    .basketball-focused {
+      color: var(--orange-dark);
+      font-weight: 600;
+      margin-top: 1rem;
+      letter-spacing: 2px;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+    }
+    .features-section {
+      background: var(--white);
+      padding: 4rem 0;
+      text-align: center;
+    }
+    .features-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 3rem;
+      position: relative;
+      display: inline-block;
+    }
+    .features-title::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 4px;
+      background: var(--orange);
+      border-radius: 2px;
+    }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+    .feature-card {
+      background: var(--white);
+      border-radius: 20px;
+      box-shadow: var(--shadow-sm);
+      padding: 2.5rem 2rem;
+      text-align: center;
+      border: 1px solid var(--gray-border);
+      transition: var(--transition);
+    }
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-md);
+    }
+    .feature-card .icon {
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+      color: var(--orange-dark);
+    }
+    .feature-card .icon.blue {
+      color: var(--blue-dark);
+    }
+    .feature-title {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+    .feature-desc {
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.7;
+    }
+    .glance-section {
+      background: linear-gradient(135deg, #fffbe7 0%, #e3f2fd 100%);
+      padding: 4rem 0;
+      text-align: center;
+    }
+    .glance-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 3rem;
+      position: relative;
+      display: inline-block;
+    }
+    .glance-title::after {
+      content: '';
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 4px;
+      background: var(--orange);
+      border-radius: 2px;
+    }
+    .glance-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 3rem;
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+    .glance-card {
+      background: var(--white);
+      border-radius: 20px;
+      box-shadow: var(--shadow-sm);
+      padding: 2.5rem 2rem;
+      text-align: center;
+      border: 1px solid var(--gray-border);
+      transition: var(--transition);
+    }
+    .glance-card:hover {
+      transform: translateY(-5px);
+      box-shadow: var(--shadow-md);
+    }
+    .glance-card svg {
+      margin: 1rem auto 1.5rem;
+      transition: var(--transition);
+      max-width: 100%;
+      height: auto;
+    }
+    .glance-card:hover svg {
+      transform: scale(1.05);
+    }
+    .glance-card .glance-label {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 1.5rem;
+    }
+    .radar-chart {
+      width: 280px;
+      height: 280px;
+      margin: 0 auto;
+    }
+    .radar-label {
+      font-family: 'Montserrat', Arial, sans-serif;
+      font-size: 12px;
+      font-weight: 500;
+      fill: var(--text);
+    }
+    .radar-polygon {
+      fill: #e3f2fd;
+      stroke: var(--blue);
+      stroke-width: 2;
+    }
+    .radar-polygon-inner {
+      fill: var(--blue);
+      fill-opacity: 0.2;
+      stroke: var(--blue);
+      stroke-width: 2;
+    }
+    .radar-axis {
+      stroke: var(--gray-border);
+      stroke-width: 1;
+    }
+    .cta-section {
+      background: linear-gradient(135deg, var(--blue) 0%, var(--blue-dark) 100%);
+      color: var(--white);
+      text-align: center;
+      padding: 4rem 2rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .cta-section::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .cta-section .cta-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+    .cta-section .cta-desc {
+      font-size: 1.2rem;
+      margin-bottom: 2.5rem;
+      color: rgba(255, 255, 255, 0.9);
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      line-height: 1.8;
+    }
+    .cta-section .get-started-btn {
+      background: var(--orange);
+      color: var(--white);
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-radius: 30px;
+      padding: 1rem 2.5rem;
+      border: none;
+      box-shadow: var(--shadow-md);
+      transition: var(--transition);
+      position: relative;
+    }
+    .cta-section .get-started-btn:hover {
+      background: var(--orange-dark);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-lg);
+    }
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--white);
+      padding: 2rem;
+      border-top: 1px solid var(--gray-border);
+    }
+    .footer .logo {
+      font-size: 1.2rem;
+    }
+    .footer .logo svg {
+      width: 1.8rem;
+      height: 1.8rem;
+    }
+    .footer-links {
+      display: flex;
+      gap: 2rem;
+    }
+    .footer-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: var(--transition);
+    }
+    .footer-links a:hover {
+      color: var(--blue);
+    }
+    .footer .socials {
+      display: flex;
+      gap: 1.5rem;
+    }
+    .footer .socials a {
+      color: var(--blue-dark);
+      font-size: 1.4rem;
+      transition: var(--transition);
+    }
+    .footer .socials a:hover {
+      color: var(--orange-dark);
+      transform: translateY(-2px);
+    }
+    .scroll-top {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--blue);
+      color: var(--white);
+      width: 3rem;
+      height: 3rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: var(--shadow-md);
+      transition: var(--transition);
+      opacity: 0;
+      visibility: hidden;
+    }
+    .scroll-top.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+    .scroll-top:hover {
+      background: var(--blue-dark);
+      transform: translateY(-3px);
+    }
+    @media (max-width: 900px) {
+      .header {
+        flex-direction: column;
+        gap: 1rem;
+        padding: 1rem;
+      }
+      .nav {
+        gap: 1rem;
+      }
+      .features-grid, .glance-cards {
+        grid-template-columns: 1fr;
+        max-width: 500px;
+      }
+      .footer {
+        flex-direction: column;
+        gap: 1.5rem;
+        text-align: center;
+      }
+      .footer-links {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+    }
+    @media (max-width: 600px) {
+      .hero-title {
+        font-size: 2rem;
+      }
+      .features-title, .glance-title, .cta-section .cta-title {
+        font-size: 1.8rem;
+      }
+      .hero-desc, .cta-section .cta-desc {
+        font-size: 1.1rem;
+      }
+      .nav {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .scroll-top {
+        bottom: 1rem;
+        right: 1rem;
+      }
+    }
+    .main-navbar {
+      width: 100%;
+      background: #fff;
+      border-bottom: 1px solid #f2f6fa;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      padding: 0;
+      margin: 0;
+    }
+    .main-nav {
+      display: flex;
+      align-items: center;
+      gap: 3rem;
+      padding: 0.5rem 2rem 0.5rem 1rem;
+    }
+    .main-nav-link {
+      color: #2c3e50;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 1.08rem;
+      position: relative;
+      padding: 0.5rem 0;
+      transition: color 0.2s;
+    }
+    .main-nav-link.active {
+      color: #ffa726;
+    }
+    .main-nav-link.active::after {
+      content: '';
+      display: block;
+      margin: 0 auto;
+      margin-top: 0.2rem;
+      width: 60%;
+      height: 2px;
+      background: #ffa726;
+      border-radius: 2px;
+    }
+    .main-nav-link:not(.active):hover {
+      color: #fb8c00;
+    }
+  </style>
+</head>
+<body>
+  <div class="main-navbar">
+    <nav class="main-nav">
+      <a href="home.html" class="main-nav-link active">Home</a>
+      <a href="coachdashboard.html" class="main-nav-link">Coach Dashboard</a>
+      <a href="questionare.html" class="main-nav-link">Questionnaire</a>
+    </nav>
+  </div>
+  <div class="header">
+    <a href="#" class="logo">
+      <svg viewBox="0 0 100 100" width="32" height="32" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="48" fill="#ff7f22" stroke="#111" stroke-width="3"/>
+        <path d="M50 2a48 48 0 0 1 0 96" fill="none" stroke="#111" stroke-width="2.5"/>
+        <path d="M2 50a48 48 0 0 0 96 0" fill="none" stroke="#111" stroke-width="2.5"/>
+        <path d="M50 2a48 48 0 0 0 0 96" fill="none" stroke="#111" stroke-width="2.5"/>
+        <path d="M20 15c20 20 60 60 60 60" fill="none" stroke="#111" stroke-width="2.5"/>
+        <path d="M80 15c-20 20-60 60-60 60" fill="none" stroke="#111" stroke-width="2.5"/>
+      </svg>
+      TeamSync
+    </a>
+    <button class="get-started-btn">Get Started</button>
+  </div>
+  <section class="hero">
+    <div class="hero-title">Analyze Your Team's <span class="chemistry">Chemistry</span></div>
+    <div class="hero-desc">
+      Unlock optimal <a href="#">basketball</a> performance with vibrant chemistry analytics powered by TeamSync.
+    </div>
+    <button class="cta-btn">Try Team Chemistry Analyzer &rarr;</button>
+    <div class="basketball-icon">
+      <svg viewBox="0 0 100 100" width="72" height="72" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="48" fill="#ff7f22" stroke="#111" stroke-width="3"/>
+        <path d="M50 2a48 48 0 0 1 0 96" fill="none" stroke="#111" stroke-width="2.5"/>
+        <path d="M2 50a48 48 0 0 0 96 0" fill="none" stroke="#111" stroke-width="2.5"/>
+        <path d="M50 2a48 48 0 0 0 0 96" fill="none" stroke="#111" stroke-width="2.5"/>
+        <path d="M20 15c20 20 60 60 60 60" fill="none" stroke="#111" stroke-width="2.5"/>
+        <path d="M80 15c-20 20-60 60-60 60" fill="none" stroke="#111" stroke-width="2.5"/>
+      </svg>
+      <div class="basketball-focused">BASKETBALL FOCUSED</div>
+    </div>
+  </section>
+  <section class="features-section">
+    <div class="features-title">Vibrant Features</div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="icon"><svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a10 10 0 0 1 0 20"/></svg></div>
+        <div class="feature-title">Chemistry Matrix</div>
+        <div class="feature-desc">Visualize player relationships and synergy with intuitive, color-coded matrices.</div>
+      </div>
+      <div class="feature-card">
+        <div class="icon blue"><svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M2 12h20"/></svg></div>
+        <div class="feature-title">Actionable Insights</div>
+        <div class="feature-desc">Get AI-powered suggestions to boost teamwork and overall court performance.</div>
+      </div>
+      <div class="feature-card">
+        <div class="icon"><svg width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4"/><path d="M8 16v-4a4 4 0 0 1 8 0v4"/></svg></div>
+        <div class="feature-title">Live Game Analytics</div>
+        <div class="feature-desc">Track chemistry in real time during games with dynamic visual feedback.</div>
+      </div>
+    </div>
+  </section>
+  <section class="glance-section">
+    <div class="glance-title">Team Chemistry at a Glance</div>
+    <div class="glance-cards">
+      <div class="glance-card">
+        <div class="glance-label">Team Synergy Radar</div>
+        <svg class="radar-chart" viewBox="0 0 340 340" width="320" height="320">
+          <!-- Background circles -->
+          <circle cx="170" cy="170" r="120" fill="none" stroke="var(--gray-border)" stroke-width="1"/>
+          <circle cx="170" cy="170" r="90" fill="none" stroke="var(--gray-border)" stroke-width="1"/>
+          <circle cx="170" cy="170" r="60" fill="none" stroke="var(--gray-border)" stroke-width="1"/>
+          <circle cx="170" cy="170" r="30" fill="none" stroke="var(--gray-border)" stroke-width="1"/>
+          
+          <!-- Axes (pentagon) -->
+          <line x1="170" y1="50" x2="170" y2="290" class="radar-axis"/>
+          <line x1="170" y1="50" x2="292.6" y2="123" class="radar-axis"/>
+          <line x1="292.6" y1="123" x2="230" y2="270" class="radar-axis"/>
+          <line x1="230" y1="270" x2="110" y2="270" class="radar-axis"/>
+          <line x1="110" y1="270" x2="47.4" y2="123" class="radar-axis"/>
+          <line x1="47.4" y1="123" x2="170" y2="50" class="radar-axis"/>
+          
+          <!-- Outer pentagon -->
+          <polygon points="170,50 292.6,123 230,270 110,270 47.4,123" class="radar-polygon"/>
+          <!-- Inner pentagon (data visualization) -->
+          <polygon points="170,90 250,140 210,240 130,240 90,140" class="radar-polygon-inner"/>
+          
+          <!-- Labels -->
+          <text x="170" y="30" text-anchor="middle" class="radar-label">Communication</text>
+          <text x="310" y="120" text-anchor="start" class="radar-label">Trust</text>
+          <text x="250" y="305" text-anchor="middle" class="radar-label">Support</text>
+          <text x="90" y="305" text-anchor="middle" class="radar-label">Strategy</text>
+          <text x="30" y="120" text-anchor="end" class="radar-label">Agility</text>
+        </svg>
+      </div>
+      <div class="glance-card">
+        <div class="glance-label">Chemistry Breakdown</div>
+        <svg width="280" height="180" viewBox="0 0 280 180">
+          <!-- Background grid -->
+          <line x1="0" y1="30" x2="280" y2="30" stroke="var(--gray-border)" stroke-width="1"/>
+          <line x1="0" y1="60" x2="280" y2="60" stroke="var(--gray-border)" stroke-width="1"/>
+          <line x1="0" y1="90" x2="280" y2="90" stroke="var(--gray-border)" stroke-width="1"/>
+          <line x1="0" y1="120" x2="280" y2="120" stroke="var(--gray-border)" stroke-width="1"/>
+          <line x1="0" y1="150" x2="280" y2="150" stroke="var(--gray-border)" stroke-width="1"/>
+          
+          <!-- Bars -->
+          <rect x="30" y="60" width="30" height="90" fill="var(--blue)" rx="4"/>
+          <rect x="80" y="50" width="30" height="100" fill="var(--blue-dark)" rx="4"/>
+          <rect x="130" y="55" width="30" height="95" fill="var(--orange)" rx="4"/>
+          <rect x="180" y="58" width="30" height="92" fill="var(--orange-dark)" rx="4"/>
+          <rect x="230" y="53" width="30" height="97" fill="#ffd54f" rx="4"/>
+          
+          <!-- Labels -->
+          <text x="45" y="170" text-anchor="middle" class="radar-label">Passing</text>
+          <text x="95" y="170" text-anchor="middle" class="radar-label">Defense</text>
+          <text x="145" y="170" text-anchor="middle" class="radar-label">Offense</text>
+          <text x="195" y="170" text-anchor="middle" class="radar-label">Focus</text>
+          <text x="245" y="170" text-anchor="middle" class="radar-label">Morale</text>
+        </svg>
+      </div>
+    </div>
+  </section>
+  <section class="cta-section">
+    <div class="cta-title">Transform Your Basketball Team</div>
+    <div class="cta-desc">Start analyzing your squad's chemistry with TeamSync and take your basketball performance to the next level.</div>
+    <button class="get-started-btn">Get Started Now</button>
+  </section>
+  <footer class="footer">
+    <a href="#" class="logo">
+      <svg viewBox="0 0 100 100" width="28" height="28" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="48" fill="#ff7f22" stroke="#111" stroke-width="3"/>
+        <path d="M50 2a48 48 0 0 1 0 96" fill="none" stroke="#111" stroke-width="2.5"/>
+        <path d="M2 50a48 48 0 0 0 96 0" fill="none" stroke="#111" stroke-width="2.5"/>
+        <path d="M50 2a48 48 0 0 0 0 96" fill="none" stroke="#111" stroke-width="2.5"/>
+        <path d="M20 15c20 20 60 60 60 60" fill="none" stroke="#111" stroke-width="2.5"/>
+        <path d="M80 15c-20 20-60 60-60 60" fill="none" stroke="#111" stroke-width="2.5"/>
+      </svg>
+      TeamSync
+    </a>
+    <div class="footer-links">
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">About</a>
+      <a href="#">Contact</a>
+    </div>
+    <div class="socials">
+      <a href="#" title="Twitter" aria-label="Twitter"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M22.46 6c-.77.35-1.6.59-2.47.7a4.3 4.3 0 0 0 1.88-2.37 8.59 8.59 0 0 1-2.72 1.04A4.28 4.28 0 0 0 16.11 4c-2.37 0-4.29 1.92-4.29 4.29 0 .34.04.67.11.99C7.69 9.13 4.07 7.38 1.64 4.7c-.37.64-.58 1.38-.58 2.17 0 1.5.76 2.82 1.92 3.6-.7-.02-1.36-.21-1.94-.53v.05c0 2.1 1.5 3.85 3.5 4.25-.36.1-.74.16-1.13.16-.28 0-.54-.03-.8-.08.54 1.7 2.1 2.94 3.95 2.97A8.6 8.6 0 0 1 2 19.54c-.32 0-.63-.02-.94-.06A12.13 12.13 0 0 0 8.29 21.5c7.55 0 11.68-6.26 11.68-11.68 0-.18-.01-.36-.02-.54A8.18 8.18 0 0 0 24 4.59a8.36 8.36 0 0 1-2.54.7z"/></svg></a>
+      <a href="#" title="Facebook" aria-label="Facebook"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M22.68 0H1.32C.59 0 0 .6 0 1.33v21.34C0 23.4.59 24 1.32 24h11.5v-9.29H9.69v-3.62h3.13V8.41c0-3.1 1.89-4.79 4.65-4.79 1.32 0 2.45.1 2.78.14v3.22h-1.91c-1.5 0-1.8.71-1.8 1.76v2.31h3.6l-.47 3.62h-3.13V24h6.13c.73 0 1.32-.6 1.32-1.33V1.33C24 .6 23.41 0 22.68 0"/></svg></a>
+    </div>
+  </footer>
+  <button class="scroll-top" aria-label="Scroll to top">
+    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <path d="M12 19V5M5 12l7-7 7 7"/>
+    </svg>
+  </button>
+  <script>
+    // Simple scroll to top functionality
+    const scrollTop = document.querySelector('.scroll-top');
+    window.addEventListener('scroll', () => {
+      if (window.pageYOffset > 100) {
+        scrollTop.classList.add('visible');
+      } else {
+        scrollTop.classList.remove('visible');
+      }
+    });
+    scrollTop.addEventListener('click', () => {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  </script>
+</body>
+</html>
